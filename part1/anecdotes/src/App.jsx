@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { use, useState } from 'react'
 
 const Button = ({onClick,text}) =>(
 	<button onClick={onClick}>{text}</button>
@@ -29,6 +29,8 @@ const App = () => {
 
 	const [votes, setVotes] = useState(Array(anecdotes.length).fill(0))
 
+	const [bestAnecdote, setBestAnecdote] = useState(0)
+
 	const randomAnecdote = () =>{
 		const newSelected = (Math.random()*anecdotes.length)
 		console.log('Next selected: ', Math.floor(newSelected))
@@ -40,14 +42,22 @@ const App = () => {
 		const newVotes = {...votes}
 		newVotes[selected] += 1
 
+		if (newVotes[selected] >= newVotes[bestAnecdote]){
+			//Update best anecdote if needed
+			setBestAnecdote(selected)
+		}
+
 		setVotes(newVotes)
 	}
 
 	return (
 		<div>
+		<h1>Anecdote of the day</h1>
 		<Anecdote anecdoteText={anecdotes[selected]} votes={votes[selected]}/>
 		<Button onClick={voteSelectedAnecdote} text={'vote'}/>
-		<Button onClick={randomAnecdote} text={'random anecdote'}/>	  
+		<Button onClick={randomAnecdote} text={'random anecdote'}/>	
+		<h1>Anecdote with most votes</h1> 
+		<Anecdote anecdoteText={anecdotes[bestAnecdote]} votes={votes[bestAnecdote]}/>
 		</div>
 	)
 }
