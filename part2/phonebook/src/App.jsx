@@ -1,13 +1,42 @@
 import { useState } from 'react'
 
-const PersonData = (props) => {
-	const person = props.person
-	return (
+const Filter = (props) => (
+	<div>filter shown with 
+		<input value={props.value} onChange={props.onChange}/>
+	</div>)
+
+const PersonData = (props) => (
 		<div>
-			{person.name} {person.number}
+			{props.person.name} {props.person.number}
+		</div>
+	)
+
+const Persons = (props) => {
+	const personList = props.persons
+	const filterFunc = props.filter
+
+	return(
+		<div>
+			{personList.filter(filterFunc).map(person => <PersonData key={person.id} person={person}/>)}
 		</div>
 	)
 }
+
+const PersonForm = (props) => (
+	<form onSubmit={props.onSubmit}>
+        <div>
+          name: 
+		  <input value={props.nameValue} onChange={props.onChangeName}/>
+        </div>
+		<div>
+		  number: 
+		  <input value={props.numberValue} onChange={props.onChangeNumber}/>
+		</div>
+        <div>
+          <button type="submit">add</button>
+        </div>
+      </form>
+)
 
 const App = () => {
   //const [persons, setPersons] = useState([{
@@ -42,7 +71,7 @@ const App = () => {
 	const personObject = {
 		name: newName,
 		number: newNumber,
-		id : persons.length() + 1
+		id : persons.length + 1
 	}
 	setPersons(persons.concat(personObject))
 
@@ -81,25 +110,15 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-	  <div>filter shown with 
-		<input value={newSearch} onChange={handleSearchChange}/>
-	  </div>
-	  <h2>add a new</h2>
-      <form onSubmit={addName}>
-        <div>
-          name: 
-		  <input value={newName} onChange={handleNameChange}/>
-        </div>
-		<div>
-		  number: 
-		  <input value={newNumber} onChange={handleNumberChange}/>
-		</div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      {persons.filter(filterNames).map(person => <PersonData key={person.id} person={person}/>)}
+	  <Filter value={newSearch} onChange={handleSearchChange}/>
+	  <h3>add a new</h3>
+	  <PersonForm
+	  	onSubmit={addName}
+		nameValue={newName} onChangeName={handleNameChange}
+		numberValue={newNumber} onChangeNumber={handleNumberChange}
+	  />
+      <h3>Numbers</h3>
+	  <Persons filter={filterNames} persons={persons}/>
     </div>
   )
 }
