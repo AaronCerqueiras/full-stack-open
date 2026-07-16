@@ -59,17 +59,27 @@ const App = () => {
 		return
 	}
 
-	const personObject = {
+	/*const personObject = {
 		name: newName,
 		number: newNumber,
 		id : persons.length + 1
+	}*/
+
+	const personObject = {
+		name: newName,
+		number: newNumber
 	}
-	setPersons(persons.concat(personObject))
+	axios.post('http://localhost:3001/persons',personObject)
+		.then(response => {
+			setPersons(persons.concat(response.data))
 
-	console.log(`${newName} added with number ${newNumber}`)
+			console.log(`${response.data.name} added with number ${response.data.number}, id ${response.data.id}`)
 
-	setNewName('')
-	setNewNumber('')
+			setNewName('')
+			setNewNumber('')
+		})
+
+	
 
   }
 
