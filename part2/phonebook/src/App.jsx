@@ -9,7 +9,7 @@ const Filter = (props) => (
 
 const PersonData = (props) => (
 		<div>
-			{props.person.name} {props.person.number}
+			{props.person.name} {props.person.number} <button onClick={props.onDeletePerson}>delete</button>
 		</div>
 	)
 
@@ -17,9 +17,15 @@ const Persons = (props) => {
 	const personList = props.persons
 	const filterFunc = props.filter
 
+	//Custom event
+	const deletePerson = (person) => {
+		console.log('Deleting person', person)
+		props.onDeletePerson(person)
+	}
+
 	return(
 		<div>
-			{personList.filter(filterFunc).map(person => <PersonData key={person.id} person={person}/>)}
+			{personList.filter(filterFunc).map(person => <PersonData key={person.id} person={person} onDeletePerson={()=> deletePerson(person)}/>)}
 		</div>
 	)
 }
@@ -81,6 +87,25 @@ const App = () => {
 			setNewNumber('')
 		})
   }
+  const handleDeletePerson = (person) => {
+	
+	console.log("Deleting from app the person:", person.id)
+	
+	if (window.confirm(`Delete ${person.name} ?`)){
+		
+		personService.deletePerson(person.id)
+		.then(deletedPerson => {
+			console.log(`${deletedPerson.name} with id ${deletedPerson.id} deleted.`)
+
+			setPersons(persons.filter(p => p.id !== deletedPerson.id))
+
+		})
+
+	}else{
+		console.log("Deletion aborted.")
+	}
+	
+  }
 
   const handleNameChange = (event) => {
 	//console.log(event.target.value)
@@ -126,7 +151,7 @@ const App = () => {
 		numberValue={newNumber} onChangeNumber={handleNumberChange}
 	  />
       <h3>Numbers</h3>
-	  <Persons filter={filterNames} persons={persons}/>
+	  <Persons filter={filterNames} persons={persons} onDeletePerson={handleDeletePerson}/>
     </div>
   )
 }
