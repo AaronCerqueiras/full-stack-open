@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import personService from './services/persons' 
 
 const Filter = (props) => (
 	<div>filter shown with 
@@ -69,18 +70,16 @@ const App = () => {
 		name: newName,
 		number: newNumber
 	}
-	axios.post('http://localhost:3001/persons',personObject)
-		.then(response => {
-			setPersons(persons.concat(response.data))
+	
+	personService.create(personObject)
+		.then(person => {
+			setPersons(persons.concat(person))
 
-			console.log(`${response.data.name} added with number ${response.data.number}, id ${response.data.id}`)
+			console.log(`${person.name} added with number ${person.number}, id ${person.id}`)
 
 			setNewName('')
 			setNewNumber('')
 		})
-
-	
-
   }
 
   const handleNameChange = (event) => {
@@ -109,10 +108,10 @@ const App = () => {
   }
 
   useEffect(() =>{
-	axios.get('http://localhost:3001/persons')
-		.then( response => {
-			console.log('Data retrieved ',response)
-			setPersons(response.data)
+	personService.getAll()
+		.then( persons => {
+			console.log('Data retrieved ',persons)
+			setPersons(persons)
 		})
   },[])
 
