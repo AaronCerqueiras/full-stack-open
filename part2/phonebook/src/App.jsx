@@ -60,7 +60,7 @@ const App = () => {
 	
 	//Check if newName is already in persons
 
-	if (persons.some(person => person.name === newName)){
+	/*if (persons.some(person => person.name === newName)){
 		console.log('Person already added!')
 		alert(`${newName} is already added to phonebook`)
 		return
@@ -76,19 +76,50 @@ const App = () => {
 		name: newName,
 		number: newNumber
 	}
-	
-	personService.create(personObject)
-		.then(person => {
-			setPersons(persons.concat(person))
 
-			console.log(`${person.name} added with number ${person.number}, id ${person.id}`)
+	if (persons.some(p => p.name === personObject.name)){
+		//Edit person
+		
+		if(window.confirm(`${personObject.name} is already added to the phonebook, replace the old number with a new one?`)){
+			const person = persons.find(p => p.name === personObject.name)
+			const updatedPerson = {...person, number:newNumber}
+			console.log('Updating person', updatedPerson)
+			
+			personService.update(updatedPerson)
+				.then(updatedPerson => {
+					setPersons(persons.map(p => p.id === updatedPerson.id ?
+						updatedPerson : p
+					))
 
-			setNewName('')
-			setNewNumber('')
+					console.log(`${updatedPerson.name} updated with number ${updatedPerson.number}, id ${updatedPerson.id}`)
+
+					setNewName('')
+					setNewNumber('')
+				})
+				.catch( error => {
+					
+					alert(`The person ${updatedPerson.name} was deleted from the server.`)
+					setPersons(persons.filter(p => p.id !== updatedPerson.id))
+				})
+		}
+	}else{
+		//Add new person
+
+		personService.create(personObject)
+			.then(person => {
+				setPersons(persons.concat(person))
+
+				console.log(`${person.name} added with number ${person.number}, id ${person.id}`)
+
+				setNewName('')
+				setNewNumber('')
 		})
-  }
-  const handleDeletePerson = (person) => {
+	}
 	
+	
+  }
+  const deletePerson = (person) => {
+
 	console.log("Deleting from app the person:", person.id)
 	
 	if (window.confirm(`Delete ${person.name} ?`)){
@@ -99,6 +130,10 @@ const App = () => {
 
 			setPersons(persons.filter(p => p.id !== deletedPerson.id))
 
+		}).catch(error => {
+					
+			alert(`The person ${person.name} was already deleted from the server.`)
+			setPersons(persons.filter(p => p.id !== person.id))
 		})
 
 	}else{
@@ -151,7 +186,7 @@ const App = () => {
 		numberValue={newNumber} onChangeNumber={handleNumberChange}
 	  />
       <h3>Numbers</h3>
-	  <Persons filter={filterNames} persons={persons} onDeletePerson={handleDeletePerson}/>
+	  <Persons filter={filterNames} persons={persons} onDeletePerson={deletePerson}/>
     </div>
   )
 }
