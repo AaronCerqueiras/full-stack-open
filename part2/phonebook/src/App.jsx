@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import personService from './services/persons' 
 
-const ErrorMessage = (props) => {
-	const message = props.message
+const Message = (props) => {
 
-	const errorStyle = {
+	const messageStyle = {
 		color: 'green',
 		backgroundColor : 'lightGrey',
 		fontSize : 20,
@@ -15,13 +14,19 @@ const ErrorMessage = (props) => {
 		borderRadius: 5,
 	}
 
-	if (message === null) {
+	const errorStyle = {...messageStyle, color: 'red'}
+
+	const notification = props.notification
+
+	if (notification === null) {
 		return null
 	}
 
+	const isError = notification.isError === null ? false : notification.isError
+
 	return (
-		<div style={errorStyle}>
-			{message}
+		<div style={isError ? errorStyle : messageStyle}>
+			{notification.message}
 		</div>
 	)
 }
@@ -80,6 +85,7 @@ const App = () => {
   const [newSearch, setNewSearch] = useState('')
 
   const [notificationMessage, setNotificationMessage] = useState(null)
+  
 
   const addName = (event) => {
 	event.preventDefault()
@@ -122,7 +128,11 @@ const App = () => {
 					setNewName('')
 					setNewNumber('')
 
-					setNotificationMessage(`Updated ${updatedPerson.name}`)
+					const newNotification = {
+						message: `Updated ${updatedPerson.name}`,
+						isError: false,
+					}
+					setNotificationMessage(newNotification)
 					setTimeout(() =>{
 						setNotificationMessage(null)
 					}, 5000)
@@ -130,7 +140,18 @@ const App = () => {
 				})
 				.catch( error => {
 					
-					alert(`The person ${updatedPerson.name} was deleted from the server.`)
+					//alert(`The person ${updatedPerson.name} was deleted from the server.`)
+
+					const newErrorNotif = {
+						message: `Information of ${updatedPerson.name} has already been removed from server`,
+						isError: true
+					}
+
+					setNotificationMessage(newErrorNotif)
+					setTimeout(() =>{
+						setNotificationMessage(null)
+					}, 5000)
+
 					setPersons(persons.filter(p => p.id !== updatedPerson.id))
 				})
 		}
@@ -146,7 +167,13 @@ const App = () => {
 				setNewName('')
 				setNewNumber('')
 
-				setNotificationMessage(`Added ${person.name}`)
+
+				const newNotification = {
+					message: `Added ${person.name}`,
+					isError: false,
+				}
+
+				setNotificationMessage(newNotification)
 					setTimeout(() =>{
 						setNotificationMessage(null)
 					}, 5000)
@@ -169,7 +196,16 @@ const App = () => {
 
 		}).catch(error => {
 					
-			alert(`The person ${person.name} was already deleted from the server.`)
+			const newErrorNotif = {
+				message: `Information of ${person.name} has already been removed from server`,
+				isError: true
+			}
+
+			setNotificationMessage(newErrorNotif)
+			setTimeout(() =>{
+				setNotificationMessage(null)
+			}, 5000)
+
 			setPersons(persons.filter(p => p.id !== person.id))
 		})
 
@@ -215,7 +251,7 @@ const App = () => {
   return (
     <div>
 		<h2>Phonebook</h2>
-		<ErrorMessage message={notificationMessage}/>
+		<Message notification={notificationMessage}/>
 		<Filter value={newSearch} onChange={handleSearchChange}/>
 		<h3>add a new</h3>
 		<PersonForm
