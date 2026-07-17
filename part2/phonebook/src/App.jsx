@@ -2,6 +2,30 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import personService from './services/persons' 
 
+const ErrorMessage = (props) => {
+	const message = props.message
+
+	const errorStyle = {
+		color: 'green',
+		backgroundColor : 'lightGrey',
+		fontSize : 20,
+		padding : 10,
+		marginBottom: 10,
+		borderStyle: 'solid',
+		borderRadius: 5,
+	}
+
+	if (message === null) {
+		return null
+	}
+
+	return (
+		<div style={errorStyle}>
+			{message}
+		</div>
+	)
+}
+
 const Filter = (props) => (
 	<div>filter shown with 
 		<input value={props.value} onChange={props.onChange}/>
@@ -55,6 +79,8 @@ const App = () => {
   //Search state
   const [newSearch, setNewSearch] = useState('')
 
+  const [notificationMessage, setNotificationMessage] = useState(null)
+
   const addName = (event) => {
 	event.preventDefault()
 	
@@ -95,6 +121,12 @@ const App = () => {
 
 					setNewName('')
 					setNewNumber('')
+
+					setNotificationMessage(`Updated ${updatedPerson.name}`)
+					setTimeout(() =>{
+						setNotificationMessage(null)
+					}, 5000)
+
 				})
 				.catch( error => {
 					
@@ -113,6 +145,11 @@ const App = () => {
 
 				setNewName('')
 				setNewNumber('')
+
+				setNotificationMessage(`Added ${person.name}`)
+					setTimeout(() =>{
+						setNotificationMessage(null)
+					}, 5000)
 		})
 	}
 	
@@ -177,16 +214,17 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
-	  <Filter value={newSearch} onChange={handleSearchChange}/>
-	  <h3>add a new</h3>
-	  <PersonForm
-	  	onSubmit={addName}
-		nameValue={newName} onChangeName={handleNameChange}
-		numberValue={newNumber} onChangeNumber={handleNumberChange}
-	  />
-      <h3>Numbers</h3>
-	  <Persons filter={filterNames} persons={persons} onDeletePerson={deletePerson}/>
+		<h2>Phonebook</h2>
+		<ErrorMessage message={notificationMessage}/>
+		<Filter value={newSearch} onChange={handleSearchChange}/>
+		<h3>add a new</h3>
+		<PersonForm
+			onSubmit={addName}
+			nameValue={newName} onChangeName={handleNameChange}
+			numberValue={newNumber} onChangeNumber={handleNumberChange}
+		/>
+		<h3>Numbers</h3>
+		<Persons filter={filterNames} persons={persons} onDeletePerson={deletePerson}/>
     </div>
   )
 }
