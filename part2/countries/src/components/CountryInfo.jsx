@@ -1,15 +1,4 @@
 
-const CountriesList = ({countries}) => {
-	
-	return(
-		<li>
-			{countries.map( (country, i) => 
-				<div key={i}>{country.name.common}</div>
-			)}
-		</li>
-	)
-}
-
 const LanguagesList = ({languages}) => {
 		<ul>
 			{Object.values(languages).map((lang,i) => <li key={i}>{lang}</li>)}
@@ -31,4 +20,4 @@ const CountryInfo = ({country}) => {
 	)
 }
 
-export default {CountriesList, CountryInfo}
+export default CountryInfo
